@@ -39,8 +39,8 @@ model Permission {
 }
 
 model ProfilePermission {
-  permissions  Permission @relation(fields: [permissionId], references: [id])
-  profiles     Profile    @relation(fields: [profileId], references: [id])
+  permissions  Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  profiles     Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   permissionId Int
   profileId    Int
 
