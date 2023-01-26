@@ -11,6 +11,8 @@ const service = new UserService();
  * create
  */
 userRoutes.post('/users',
+  isAuthenticated,
+  hasPermission(['criar, editar usuário']),
   body('name').notEmpty().withMessage('Name is required'),
   body('email').notEmpty().isEmail().withMessage('Email is required and must be unique'),
   body('password').notEmpty().withMessage('Password is required'),
@@ -31,25 +33,30 @@ userRoutes.post('/users',
  */
 userRoutes.get('/users',
   isAuthenticated,
-  hasPermission(['Listar Todos usuários', 'Criar, Editar Usuário']),
+  hasPermission(['buscar usuários']),
   async (req: Request, res: Response) => {
-  const result = await service.findAll();
-  return res.json(result);
-});
+    const result = await service.findAll();
+    return res.json(result);
+  });
 
 /**
  * find by id
  */
-userRoutes.get('/users/:userId', async (req: Request, res: Response) => {
-  const { userId } = req.params;
-  const result = await service.findById(+userId);
-  return res.json(result);
-});
+userRoutes.get('/users/:userId',
+  isAuthenticated,
+  hasPermission(['buscar usuários']),
+  async (req: Request, res: Response) => {
+    const { userId } = req.params;
+    const result = await service.findById(+userId);
+    return res.json(result);
+  });
 
 /**
  * update
  */
 userRoutes.patch('/users/:userId',
+  isAuthenticated,
+  hasPermission(['detalhes usuário']),
   body('name').notEmpty().withMessage('Name is required'),
   body('email').notEmpty().isEmail().withMessage('Email is required and must be unique'),
   body('profileId').notEmpty().withMessage('Profile is required'),
@@ -68,6 +75,8 @@ userRoutes.patch('/users/:userId',
  * update password
  */
 userRoutes.patch('/users/passwd/:userId',
+  isAuthenticated,
+  hasPermission(['criar, editar usuário']),
   body('password').notEmpty().withMessage('Password is required'),
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -76,7 +85,7 @@ userRoutes.patch('/users/passwd/:userId',
     }
     const { userId } = req.params;
     const { password, confirmPassword } = req.body;
-    const result = await service.updatePassword(+userId, { password, confirmPassword } );
+    const result = await service.updatePassword(+userId, { password, confirmPassword });
     return res.json(result);
   }
 );

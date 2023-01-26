@@ -22,10 +22,6 @@ export function hasPermission(permissionsRoutes: string[]) {
       }
     });
 
-    if (!user) {
-      return res.status(400).json('User doest not exists');
-    }
-
     const permissionExists = user.profile.profilePermissions.some((permission) => 
     permissionsRoutes.includes(permission.permissions.name));
 
