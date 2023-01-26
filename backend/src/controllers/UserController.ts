@@ -2,6 +2,7 @@ import { Request, Response, Router } from "express";
 import { UserService } from "../services/UserService";
 import { body, validationResult } from "express-validator";
 import { isAuthenticated } from "../middlewares/isAuthenticated";
+import { hasPermission } from "../middlewares/hasPermission";
 
 export const userRoutes = Router();
 const service = new UserService();
@@ -30,6 +31,7 @@ userRoutes.post('/users',
  */
 userRoutes.get('/users',
   isAuthenticated,
+  hasPermission(['Listar Todos usuários', 'Criar, Editar Usuário']),
   async (req: Request, res: Response) => {
   const result = await service.findAll();
   return res.json(result);
