@@ -10,6 +10,17 @@ interface UserRequest {
   profileId: number;
 }
 
+interface UserUpdate {
+  name: string;
+  email: string;
+  profileId: number;
+}
+
+interface UserPasswordUpdate {
+  password: string;
+  confirmPassword: string;
+}
+
 export class UserService {
 
   /**
@@ -44,7 +55,7 @@ export class UserService {
         id: true, name: true, email: true, profile: true
       }
     });
-    
+
     return user;
 
   }
@@ -53,28 +64,79 @@ export class UserService {
    * find all
    */
   async findAll() {
-
+    return await prisma.user.findMany({
+      select: {
+        id: true, name: true, email: true, profile: true
+      }
+    });
   }
 
   /**
    * find by id
    */
   async findById(userId: number) {
-
+    const user = await prisma.user.findFirst({
+      where: { id: userId },
+      select: {
+        id: true, name: true, email: true, profile: true
+      }
+    });
+    return user;
   }
 
   /**
    * update
    */
-  async update() {
+  async update(userId: number, { name, email, profileId }: UserUpdate) {
+
+    const userUpdated = await prisma.user.findFirst({
+      where: { id: userId }
+    });
+
+    const exists = await prisma.user.findFirst({
+      where: { email }
+    });
+
+    if (exists && exists.id !== userUpdated?.id) {
+      throw new ConflictException('Email already registered');
+    }
+
+    return await prisma.user.update({
+      where: { id: userId },
+      data: {
+        name, email, profile: {
+          connect: { id: profileId }
+        }
+      },
+      select: {
+        id: true, name: true, email: true, profile: true
+      }
+    });
 
   }
 
   /**
    * update password
    */
-  async updatePassword() {
+  async updatePassword(userId: number, { password, confirmPassword }: UserPasswordUpdate) {
+    
+    const hashPassword = await hash(password, 8);
 
+    if (password !== confirmPassword) {
+      throw new Error('Passwords not matches!');
+    } 
+    
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        password: hashPassword
+      },
+      select: {
+        id: true, name: true, email: true, profile: true
+      }
+    });
+
+    return user;
   }
 
 }
