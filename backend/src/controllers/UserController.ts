@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import { UserService } from "../services/UserService";
 import { body, validationResult } from "express-validator";
+import { isAuthenticated } from "../middlewares/isAuthenticated";
 
 export const userRoutes = Router();
 const service = new UserService();
@@ -27,7 +28,9 @@ userRoutes.post('/users',
 /**
  * find all
  */
-userRoutes.get('/users', async (req: Request, res: Response) => {
+userRoutes.get('/users',
+  isAuthenticated,
+  async (req: Request, res: Response) => {
   const result = await service.findAll();
   return res.json(result);
 });
