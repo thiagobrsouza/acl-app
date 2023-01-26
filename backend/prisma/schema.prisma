@@ -9,3 +9,41 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        Int     @id @default(autoincrement())
+  name      String  @db.VarChar(255)
+  email     String  @unique @db.VarChar(255)
+  password  String  @db.VarChar(255)
+  profile   Profile @relation(fields: [profileId], references: [id])
+  profileId Int
+
+  @@map("users")
+}
+
+model Profile {
+  id                 Int                 @id @default(autoincrement())
+  name               String              @unique @db.VarChar(255)
+  users              User[]
+  profilePermissions ProfilePermission[]
+
+  @@map("profiles")
+}
+
+model Permission {
+  id                 Int                 @id @default(autoincrement())
+  name               String              @db.VarChar(255)
+  profilePermissions ProfilePermission[]
+
+  @@map("permissions")
+}
+
+model ProfilePermission {
+  permissions  Permission @relation(fields: [permissionId], references: [id])
+  profiles     Profile    @relation(fields: [profileId], references: [id])
+  permissionId Int
+  profileId    Int
+
+  @@id([permissionId, profileId])
+  @@map("profile-permissions")
+}
