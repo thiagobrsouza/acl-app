@@ -20,4 +20,14 @@ export class CarService {
     return car;
   }
 
+  /**
+   * find all cars by user id
+   */
+  async findMyCars(userId: number) {
+    const cars = await prisma.car.findMany({
+      where: { userId: userId }
+    });
+    return cars;
+  }
+
 }

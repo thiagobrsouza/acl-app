@@ -11,18 +11,30 @@ const service = new CarService();
  */
 carRoutes.get('/cars',
   isAuthenticated,
-  hasPermission(['controle total permissoes']),
+  hasPermission(['buscar carros']),
   async (req: Request, res: Response) => {
     const result = await service.findAll();
     return res.json(result);
   });
 
 /**
+ * find my cars
+ */
+carRoutes.get('/cars/me',
+  isAuthenticated,
+  hasPermission(['ver apenas seus carros']),
+  async (req: Request, res: Response) => {
+    const result = await service.findMyCars(+req.userId);
+    return res.json(result);
+  }
+);
+
+/**
  * find by id
  */
-carRoutes.get('/cars/:carId',
+carRoutes.get('/cars/:carId(\\d+)',
   isAuthenticated,
-  hasPermission(['controle total permissoes']),
+  hasPermission(['buscar carros']),
   async (req: Request, res: Response) => {
     const { carId } = req.params;
     const result = await service.findById(+carId);
