@@ -42,7 +42,7 @@ userRoutes.get('/users',
 /**
  * find by id
  */
-userRoutes.get('/users/:userId',
+userRoutes.get('/users/:userId(\\d+)',
   isAuthenticated,
   hasPermission(['buscar usuários']),
   async (req: Request, res: Response) => {
@@ -54,7 +54,7 @@ userRoutes.get('/users/:userId',
 /**
  * update
  */
-userRoutes.patch('/users/:userId',
+userRoutes.patch('/users/:userId(\\d+)',
   isAuthenticated,
   hasPermission(['detalhes usuário']),
   body('name').notEmpty().withMessage('Name is required'),
@@ -86,6 +86,37 @@ userRoutes.patch('/users/passwd/:userId',
     const { userId } = req.params;
     const { password, confirmPassword } = req.body;
     const result = await service.updatePassword(+userId, { password, confirmPassword });
+    return res.json(result);
+  }
+);
+
+/**
+ * user details me
+ */
+userRoutes.get('/users/me',
+  isAuthenticated,
+  async (req: Request, res: Response) => {
+    const result = await service.userDetails(+req.userId);
+    return res.json(result);
+  }
+);
+
+/**
+ * update me
+ */
+userRoutes.patch('/users/me',
+  isAuthenticated,
+  body('name').notEmpty().withMessage('Name is required'),
+  body('email').notEmpty().isEmail().withMessage('Email is required and must be unique'),
+  body('profileId').notEmpty().withMessage('Profile is required'),
+  body('password').notEmpty().withMessage('Password is required'),
+  async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const { name, email, password, confirmPassword } = req.body;
+    const result = await service.updateMe(+req.userId, { name, email, password, confirmPassword });
     return res.json(result);
   }
 );

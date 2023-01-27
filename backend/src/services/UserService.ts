@@ -21,6 +21,13 @@ interface UserPasswordUpdate {
   confirmPassword: string;
 }
 
+interface UserUpdateMe {
+  name?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+}
+
 export class UserService {
 
   /**
@@ -137,6 +144,53 @@ export class UserService {
     });
 
     return user;
+  }
+
+  /**
+   * user details me
+   */
+  async userDetails(userId: number) {
+    const user = await prisma.user.findFirst({
+      where: { id: userId },
+      select: {
+        id: true, name: true, email: true
+      }
+    });
+    return user;
+  }
+
+  /**
+   * update self
+   */
+  async updateMe(userId: number, { name, email, password, confirmPassword }: UserUpdateMe) {
+    const userUpdated = await prisma.user.findFirst({
+      where: { id: userId }
+    });
+
+    const exists = await prisma.user.findFirst({
+      where: { email }
+    });
+
+    if (exists && exists.id !== userUpdated?.id) {
+      throw new ConflictException('Email already registered');
+    }
+
+    const hashPassword = await hash(password, 8);
+
+    if (password !== confirmPassword) {
+      throw new Error('Passwords not matches!');
+    }
+
+    return await prisma.user.update({
+      where: { id: userId },
+      data: {
+        name, email, password: hashPassword
+      },
+      select: {
+        id: true, name: true, email: true
+      }
+    });
+
   }
 
 }
