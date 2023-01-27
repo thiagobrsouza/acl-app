@@ -28,7 +28,7 @@ export class AuthenticationService {
     const token = sign(
       { email: user.email },
       process.env.JWT_SECRET,
-      { subject: user.id.toString(), expiresIn: '1d' }
+      { subject: user.id.toString(), expiresIn: '30d' }
     );
 
     return {

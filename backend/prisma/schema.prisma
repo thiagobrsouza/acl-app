@@ -17,6 +17,7 @@ model User {
   password  String  @db.VarChar(255)
   profile   Profile @relation(fields: [profileId], references: [id])
   profileId Int
+  cars       Car[]
 
   @@map("users")
 }
@@ -46,4 +47,15 @@ model ProfilePermission {
 
   @@id([permissionId, profileId])
   @@map("profile-permissions")
+}
+
+model Car {
+  id           Int    @id @default(autoincrement())
+  model        String
+  manufacturer String
+  price        String
+  user         User   @relation(fields: [userId], references: [id])
+  userId       Int
+
+  @@map("cars")
 }
