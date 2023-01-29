@@ -26,7 +26,7 @@ export function Navbar() {
 
             <li className="nav-item">
               <Link href="/users" className="nav-link">
-                Profiles
+                Users
               </Link>
             </li>
 
