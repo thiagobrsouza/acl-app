@@ -11,8 +11,8 @@ const service = new ProfileService();
  * create
  */
 profileRoutes.post('/profiles',
-  isAuthenticated,
-  hasPermission(['criar, editar perfil']),
+  //isAuthenticated,
+  //hasPermission(['criar, editar perfil']),
   body('name').notEmpty().withMessage('Name is required and must be unique'),
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -28,8 +28,8 @@ profileRoutes.post('/profiles',
  * find all
  */
 profileRoutes.get('/profiles',
-  isAuthenticated,
-  hasPermission(['buscar perfis']),
+  //isAuthenticated,
+  //hasPermission(['buscar perfis']),
   async (req: Request, res: Response) => {
     const result = await service.findAll();
     return res.json(result);
